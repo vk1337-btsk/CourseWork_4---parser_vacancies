@@ -10,6 +10,9 @@ python = "^3.12"
 requests = "^2.31.0"
 pytest = "^7.4.4"
 pytest-cov = "^4.1.0"
+bs4 = "^0.0.2"
+lxml = "^5.1.0"
+jsonlines = "^4.0.0"
 
 
 [build-system]

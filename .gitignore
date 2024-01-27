@@ -4,4 +4,8 @@ poetry.lock
 
 # PyCharm
 .idea
+__pycache__
+
+# MyProject
+config.py
 
