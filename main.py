@@ -1,11 +1,13 @@
-from src.classes.parser_vacancy_hh import ParserVacancyHH
-from src.classes.parser_vacancy_sj import ParserVacancySJ
+from src.classes.parser_hh import ParserVacancyHH
+from src.classes.parser_sj import ParserVacancySJ
+from src.classes.get_data import GetDataFromUser
 
 
 if __name__ == '__main__':
 
-    hh = ParserVacancyHH()
+    criteria = GetDataFromUser()
+    hh = ParserVacancyHH(criteria)
     hh.get_all_vacancies()
 
-    sj = ParserVacancySJ()
+    sj = ParserVacancySJ(criteria)
     sj.get_all_vacancies()
