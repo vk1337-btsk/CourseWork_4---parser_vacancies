@@ -1,5 +1,5 @@
 import requests
-from config import API_CLIENT_ID, API_CLIENT_SECRET
+from constant import API_CLIENT_ID, API_CLIENT_SECRET
 from src.classes.parser import Parser
 
 
@@ -18,11 +18,11 @@ class ParserVacancyHH(Parser):
         """Initialization attributes classes
         :param search_criteria: criteria for search vacancies.
         """
-        self.search_criteria = search_criteria
+        self.search_criteria = search_criteria.__dict__
         self.headers = self.get_headers()
         self.params = self.get_params()
 
-    def get_headers(self):
+    def get_headers(self) -> dict:
         """Method that generates headers for a request to the site.
         :return: headers for a request to the site
         """
@@ -30,47 +30,75 @@ class ParserVacancyHH(Parser):
                                  'Chrome/121.0.0.0 Safari/537.36'}
         return headers
 
-    def get_params(self):
+    def get_params(self) -> dict:
         """Method that generates parameters for a request to the site.
         :return: parameters for a request to the site
         """
-        params = {
+        criteria_name = self.search_criteria['name_vacancy']
+        criteria_experience = None if self.search_criteria['experience'] is None \
+            else self.search_criteria['experience']['hh']
+
+        params_ = {
                 # Parameters for parsing
                 'page': 0,  # Number page site
                 'per_page': 100,  # Number of requests on page
                 # Parameters for search
-                'text': self.search_criteria.name_vacancy  # Keyword for search (name vacancy or etc.)
+                'text': criteria_name,  # Keyword for search (name vacancy or etc.)
+                'experience': criteria_experience  # Experience work
         }
 
-        for key, value in params.items():
-            if value is None:
-                del params[key]
+        params = {key: value for key, value in params_.items() if value is not None}
+
         return params
 
     @staticmethod
-    def formatting_vacancy(info_vacancy):
+    def formatting_vacancy(info_vacancy: dict) -> dict:
         """This method receives one dictionary with information about one job and reduces it to a template form."""
-        return info_vacancy
 
-    def get_all_vacancies(self):
+        def choice_currency(currency):
+            if currency == 'RUR':
+                return 'RUB'
+            elif currency == 'BYR':
+                return 'BYN'
+
+        vacancy = \
+            {
+                'name': info_vacancy['name'],
+                'address': ('Не указан' if not info_vacancy.get('address')
+                            else info_vacancy['address'].get('raw', 'Не указан')),
+                'salary':
+                    {
+                        'from': 0 if not info_vacancy.get('salary') else info_vacancy['salary'].get('from', 0),
+                        'to': 0 if not info_vacancy.get('salary') else info_vacancy['salary'].get('to', 0),
+                        'currency': 0 if not info_vacancy.get('salary') else
+                        choice_currency(info_vacancy['salary'].get('currency', 0)),
+                    },
+                'experience': Parser.get_value_experience(info_vacancy['experience']['id']),
+                'employment': Parser.get_value_employment(info_vacancy['employment']['id']),
+                'url': info_vacancy['alternate_url'],
+                'Web-site': "HeadHunter"
+            }
+        return vacancy
+
+    def get_all_vacancies(self) -> list:
         """This method requests job data from a site, retrieves it, transforms it, and stores it.
         This method returns nothing."""
         name_array = 'items'
-        super().create_json(self.name_file)
-
+        list_vacancies = []
+        print('Пожалуйста, подождите. Загружаем вакансии с сайта HeadHunter.ru')
         while True:
             try:
                 response = super().get_response(basic_url=self.basic_url, headers=self.headers, params=self.params)
-                list_vacancies = response[name_array]
+                response_list_vacancies = response[name_array]
                 last_page = response['pages']
                 self.params['page'] += 1
-                super().time_sleep()
-                for vacancy in list_vacancies:
-                    super().add_in_json(self.name_file, self.formatting_vacancy(vacancy))
+                super().get_time_for_sleep()
+                for vacancy in response_list_vacancies:
+                    list_vacancies.append(self.formatting_vacancy(vacancy))
 
                 if last_page == self.params['page']:
                     break
-                break
             except requests.HTTPError:
-                print('Прерываем работу из-за ошибки или из-за того, что мы достигли глубины пагинации')
                 break
+
+        return list_vacancies

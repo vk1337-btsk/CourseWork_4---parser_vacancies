@@ -9,3 +9,7 @@ __pycache__
 # MyProject
 config.py
 data/
+
+#Testing
+/.coverage
+htmlcov/
