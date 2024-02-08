@@ -60,6 +60,7 @@ class ParserVacancyHH(Parser):
                 return 'RUB'
             elif currency == 'BYR':
                 return 'BYN'
+            return currency
 
         vacancy = \
             {

@@ -11,39 +11,39 @@ class Vacancy(Mixin):
         self.exchange_rate = Mixin.get_exchange_rate()
 
         self.info_vacancy = dict_info_vacancy
-        self.__name = self.info_vacancy['name']
-        self.__address = self.info_vacancy['address']
-        self.__salary_from = 0 if self.info_vacancy['salary']['from'] is None else self.info_vacancy['salary']['from']
-        self.__salary_to = 0 if self.info_vacancy['salary']['to'] is None else self.info_vacancy['salary']['to']
-        self.__salary_currency = (0 if self.info_vacancy['salary']['currency'] is None
+        self.name = self.info_vacancy['name']
+        self.address = self.info_vacancy['address']
+        self.salary_from = 0 if self.info_vacancy['salary']['from'] is None else self.info_vacancy['salary']['from']
+        self.salary_to = 0 if self.info_vacancy['salary']['to'] is None else self.info_vacancy['salary']['to']
+        self.salary_currency = (0 if self.info_vacancy['salary']['currency'] is None
                                   else self.info_vacancy['salary']['currency'])
-        self.__experience = self.info_vacancy['experience']
-        self.__employment = self.info_vacancy['employment']
-        self.__url = self.info_vacancy['url']
-        self.__web_site = self.info_vacancy['Web-site']
+        self.experience = self.info_vacancy['experience']
+        self.employment = self.info_vacancy['employment']
+        self.url = self.info_vacancy['url']
+        self.web_site = self.info_vacancy['Web-site']
 
     # Magic methods str and repr
     def __str__(self) -> str:
         """Shows information for user"""
-        if all(map(lambda x: x == 0, [self.__salary_from, self.__salary_to, self.__salary_currency])):
-            return f'Вакансия: {self.__name}, зарплата не указана. Ссылка на вакансию: {self.__url}'
-        return (f'Вакансия: {self.__name}, зарплата {self.__salary_from}-{self.__salary_to} {self.__salary_currency}. '
-                f'Ссылка на вакансию: {self.__url}')
+        if all(map(lambda x: x == 0, [self.salary_from, self.salary_to, self.salary_currency])):
+            return f'Вакансия: {self.name}, зарплата не указана. Ссылка на вакансию: {self.url}'
+        return (f'Вакансия: {self.name}, зарплата {self.salary_from}-{self.salary_to} {self.salary_currency}. '
+                f'Ссылка на вакансию: {self.url}')
 
     def __repr__(self) -> str:
         """Shows information for developer"""
         return (f'Экземпляр класса: {self.__class__.__name__}\n'
-                f'С аргументами: {self.__name=}, {self.__address=}, {self.__salary_from=}, {self.__salary_to=},'
-                f'{self.__salary_currency=}, {self.__experience=}, {self.__employment=}, {self.__url=}, '
-                f'{self.__web_site=}.')
+                f'С аргументами: {self.name=}, {self.address=}, {self.salary_from=}, {self.salary_to=},'
+                f'{self.salary_currency=}, {self.experience=}, {self.employment=}, {self.url=}, '
+                f'{self.web_site=}.')
 
     # Magic methods comparison
     def prepare_comparison_data(self, other: object) -> tuple[str, int, int, str, int, int]:
         """This method prepares data for comparisons vacancies."""
-        self_name = self.__name
-        self_from = self.__salary_from
-        self_to = self.__salary_to
-        self_currency = self.__salary_currency
+        self_name = self.name
+        self_from = self.salary_from
+        self_to = self.salary_to
+        self_currency = self.salary_currency
 
         other_name = other.info_vacancy['name']
         other_from = other.info_vacancy['salary']['from']
@@ -100,10 +100,10 @@ class Vacancy(Mixin):
     def vacancy_to_dict(self) -> dict:
         """This method returns a dictionary with job information"""
         dict_vacancy = \
-            {'name': self.__name, 'address': self.__address,
-             'salary': {'from': self.__salary_from, 'to': self.__salary_to, 'currency': self.__salary_currency},
-             'experience': self.__experience, 'employment': self.__employment, 'url': self.__url,
-             'Web-site': self.__web_site}
+            {'name': self.name, 'address': self.address,
+             'salary': {'from': self.salary_from, 'to': self.salary_to, 'currency': self.salary_currency},
+             'experience': self.experience, 'employment': self.employment, 'url': self.url,
+             'Web-site': self.web_site}
         return dict_vacancy
 
     def convert_currency(self, salary: float or int, currency: str) -> float or int:
